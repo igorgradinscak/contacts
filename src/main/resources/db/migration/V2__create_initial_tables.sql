@@ -13,7 +13,7 @@ create table public.contact
     first_name          varchar(256)                not null,
     last_name           varchar(256)                not null,
     email               varchar(256)                not null,
-    phone_number_ids    integer[]                   not null   constraint contact_phone_number_ids_fk references public.phone_number(id),
+    phone_number_id     integer                     not null   constraint contact_phone_number_id_fk references public.phone_number,
     created             timestamp with time zone    not null,
     updated             timestamp with time zone    not null,
     deleted             timestamp with time zone
