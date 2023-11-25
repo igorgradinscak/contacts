@@ -6,6 +6,9 @@ import lombok.NonNull;
 import org.jugenfeier.contacts.model.Contact;
 import org.jugenfeier.contacts.model.PhoneNumber;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Data
 public class ContactDTO {
 
@@ -25,7 +28,7 @@ public class ContactDTO {
     private String email;
 
     @Schema(description = "Phone number")
-    private PhoneNumberDTO phoneNumber;
+    private List<PhoneNumberDTO> phoneNumberDTOList;
 
     public ContactDTO(final Contact contact) {
         this.id = contact.getId();
@@ -33,6 +36,8 @@ public class ContactDTO {
         this.firstName = contact.getFirstName();
         this.lastName = contact.getLastName();
         this.email = contact.getEmail();
-        this.phoneNumber = new PhoneNumberDTO(contact.getPhoneNumber());
+        this.phoneNumberDTOList = contact.getPhoneNumberList().stream()
+                .map(PhoneNumberDTO::new)
+                .collect(Collectors.toList());
     }
 }

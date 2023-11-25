@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.util.List;
+
 @Data
 public class ContactModificationDTO {
 
@@ -20,20 +22,20 @@ public class ContactModificationDTO {
     private String email;
 
     @Schema(description = "Contact phone number")
-    private PhoneNumberModificationDTO phoneNumber;
+    private List<PhoneNumberModificationDTO> phoneNumberList;
 
     public ContactModificationDTO(
             final String username,
             @NonNull final String firstName,
             @NonNull final String lastName,
             @NonNull final String email,
-            @NonNull final PhoneNumberModificationDTO phoneNumber
+            @NonNull final List<PhoneNumberModificationDTO> phoneNumberList
             ) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.phoneNumber = phoneNumber;
+        this.phoneNumberList = phoneNumberList;
     }
 
     @Schema(hidden = true)
@@ -44,6 +46,8 @@ public class ContactModificationDTO {
             return false;
         }
 
-        return true;
+        // Use Stream API to check if all phone numbers are valid
+        return phoneNumberList.stream()
+                .allMatch(PhoneNumberModificationDTO::isPhoneNumberValid);
     }
 }

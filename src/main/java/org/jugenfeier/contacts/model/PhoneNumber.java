@@ -1,5 +1,6 @@
 package org.jugenfeier.contacts.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -29,4 +30,12 @@ public class PhoneNumber extends SoftDeletedModelBase {
 
     @Column(name = "telephone_number")
     private String telephoneNumber;
+
+    @Column(name = "contact_id", nullable = false, insertable = false, updatable = false)
+    private Integer contactId;
+
+    @ManyToOne
+    @JoinColumn(name="contact_id", nullable = false)
+    @JsonBackReference
+    private Contact contact;
 }

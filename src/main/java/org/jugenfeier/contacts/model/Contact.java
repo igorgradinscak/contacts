@@ -1,9 +1,12 @@
 package org.jugenfeier.contacts.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Where;
 import org.jugenfeier.contacts.model.base.BusinessModelBase;
+
+import java.util.List;
 
 @Entity
 @Table(name="contact")
@@ -11,7 +14,7 @@ import org.jugenfeier.contacts.model.base.BusinessModelBase;
 @AllArgsConstructor @NoArgsConstructor
 @Builder
 @Getter @Setter
-@ToString
+@ToString(exclude = "phoneNumberList")
 public class Contact extends BusinessModelBase {
     public final static String FIELD_NAME_ID = "id";
     public final static String FIELD_NAME_USERNAME = "username";
@@ -37,11 +40,7 @@ public class Contact extends BusinessModelBase {
     @Column(length = 256)
     private String email;
 
-    @Column(name = "phone_number_id", nullable = false, insertable = false, updatable = false)
-    private Integer phoneNumberId;
-
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "phone_number_id", nullable = false)
-    @ToString.Exclude
-    private PhoneNumber phoneNumber;
+    @OneToMany (mappedBy = "contact", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<PhoneNumber> phoneNumberList;
 }

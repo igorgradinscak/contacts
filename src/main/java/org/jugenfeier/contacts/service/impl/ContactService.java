@@ -22,34 +22,45 @@ public class ContactService implements IContactService {
 
     @Override
     public List<Contact> getAllContactsWithoutDeleted(){
-        return contactRepository.findAllExcludeDeleted();
+        return contactRepository.findAll();
     }
 
     @Override
-    public Contact createNewContact(ContactModificationDTO contactModificationDTO) throws Exception {
+    public Contact createNewContact(ContactModificationDTO contactModificationDTO) {
         log.trace("Creating new Contact with data: {}", contactModificationDTO);
 
-        final PhoneNumber phoneNumber = PhoneNumber.builder()
-                .callNumber(contactModificationDTO.getPhoneNumber().getCallNumber())
-                .telephoneNumber(contactModificationDTO.getPhoneNumber().getTelephoneNumber())
-                .build();
-
-        try {
-            phoneNumberRepository.save(phoneNumber);
-        } catch (Exception e) {
-            log.warn("Error while saving new Contact phone number with data: {}, exception: {}", phoneNumber, e.getMessage());
-            throw new Exception("Exception while creating new phone number");
-        }
-
-        final Contact contact = Contact.builder()
+        Contact contact = Contact.builder()
                 .username(contactModificationDTO.getUsername())
                 .firstName(contactModificationDTO.getFirstName())
                 .lastName(contactModificationDTO.getLastName())
                 .email(contactModificationDTO.getEmail())
-                .phoneNumber(phoneNumber)
                 .build();
         log.trace("Saving new Contact: {}", contact);
-        return contactRepository.save(contact);
+        contact = contactRepository.save(contact);
+
+        Contact finalContact = contact;
+        List<PhoneNumber> phoneNumberList = contactModificationDTO.getPhoneNumberList().stream()
+                .map(phone -> {
+                    try {
+                        PhoneNumber phoneNumber = PhoneNumber.builder()
+                                .callNumber(phone.getCallNumber())
+                                .telephoneNumber(phone.getTelephoneNumber())
+                                .contact(finalContact)
+                                .build();
+                        phoneNumberRepository.save(phoneNumber);
+                        return phoneNumber;
+                    } catch (Exception e) {
+                        log.warn("Error while saving new Contact phone number with data: {}, exception: {}", phone, e.getMessage());
+                        throw new RuntimeException("Exception while creating new phone number");
+                    }
+                })
+                .toList();
+
+        // Update the Contact with the saved PhoneNumber list
+        contact.setPhoneNumberList(phoneNumberList);
+        contact = contactRepository.save(contact);
+
+        return contact;
     }
 
     @Override
@@ -69,8 +80,11 @@ public class ContactService implements IContactService {
     @Override
     public void deleteContact(int contactId) {
         final Contact contact = contactRepository.findById(contactId).orElseThrow();
+        contact.getPhoneNumberList().forEach(phoneNumber -> {
+            log.trace("Deleting phone number: {}", phoneNumber);
+            phoneNumberRepository.deleteById(phoneNumber.getId());
+        });
         log.trace("Deleting contact: {}", contact);
-        phoneNumberRepository.deleteById(contact.getPhoneNumberId());
         contactRepository.delete(contact);
     }
 }
