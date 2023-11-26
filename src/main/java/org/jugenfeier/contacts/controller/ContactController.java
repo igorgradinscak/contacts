@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jugenfeier.contacts.dto.ContactDTO;
 import org.jugenfeier.contacts.dto.ContactModificationDTO;
+import org.jugenfeier.contacts.dto.ContactUpdateModificationDTO;
 import org.jugenfeier.contacts.service.IContactService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +26,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 @Tag(name = "Contact system", description = "Contact System API Endpoints")
-public class ContactController {
-
-    private final static String OK = "OK";
-
+public class ContactController{
     private final IContactService contactService;
 
     @Operation(summary = "Get all contacts")
@@ -56,7 +54,7 @@ public class ContactController {
         log.debug("Request received: createNewContact()");
         log.trace("Body: {}", contactModificationDTO);
 
-        if (!contactModificationDTO.isRequestValid(true)) {
+        if (!contactModificationDTO.isRequestValid()) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -77,17 +75,21 @@ public class ContactController {
     @PutMapping("{contactId}")
     public ResponseEntity<ContactDTO> updateContactById(
             @PathVariable("contactId") int contactId,
-            @RequestBody final ContactModificationDTO contactModificationDTO) {
+            @Valid @RequestBody final ContactUpdateModificationDTO contactUpdateModificationDTO) {
         log.debug("Request received: updateContactById()");
-        log.trace("Contact ID: {} Body: {}", contactId, contactModificationDTO);
+        if (contactId == 0) {
+            log.warn("Contact ID is not set (equals 0)");
+            return ResponseEntity.badRequest().build();
+        }
+        log.trace("Contact ID: {} Body: {}", contactId, contactUpdateModificationDTO);
 
-        if (!contactModificationDTO.isRequestValid(false)) {
+        if (!contactUpdateModificationDTO.isRequestValid()) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
             return ResponseEntity.ok(new ContactDTO(
-                    contactService.updateContact(contactModificationDTO, contactId)));
+                    contactService.updateContact(contactUpdateModificationDTO, contactId)));
         } catch (final NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         } catch (final Exception e) {
@@ -99,6 +101,7 @@ public class ContactController {
     @Parameter(name = "contactId", description = "Contact ID", example = "1 ")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Delete successful", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid request body", content = @Content),
             @ApiResponse(responseCode = "404", description = "Contact not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
@@ -107,6 +110,11 @@ public class ContactController {
             @PathVariable("contactId") final int contactId
     ){
         log.debug("Request received: deleteContact()");
+        if (contactId == 0) {
+            log.warn("Contact ID is not set (equals 0)");
+            return ResponseEntity.badRequest().build();
+        }
+
         log.trace("Contact id: {}", contactId);
 
         try {

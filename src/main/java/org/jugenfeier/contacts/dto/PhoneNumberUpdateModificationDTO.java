@@ -6,7 +6,9 @@ import lombok.NonNull;
 import org.jugenfeier.contacts.util.Validator;
 
 @Data
-public class PhoneNumberModificationDTO {
+public class PhoneNumberUpdateModificationDTO {
+    @Schema(description = "id", example = "1")
+    private Integer id;
 
     @Schema(description = "Call Number", example = "+385")
     private String callNumber;
@@ -14,11 +16,12 @@ public class PhoneNumberModificationDTO {
     @Schema(description = "Telephone number", example = "91-123-1234")
     private String telephoneNumber;
 
-    public PhoneNumberModificationDTO(
+    public PhoneNumberUpdateModificationDTO(
             final Integer id,
             @NonNull final String callNumber,
             @NonNull final String telephoneNumber
     ) {
+        this.id = id;
         this.callNumber = callNumber;
         this.telephoneNumber = telephoneNumber;
     }
@@ -36,6 +39,7 @@ public class PhoneNumberModificationDTO {
      */
     @Schema(hidden = true)
     public boolean isPhoneNumberValid() {
+
         boolean isCallNumberValid = Validator.validateCallNumber(callNumber);
         boolean isTelephoneNumberValid = Validator.validateTelephoneNumber(telephoneNumber);
 

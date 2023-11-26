@@ -1,11 +1,12 @@
 package org.jugenfeier.contacts.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.annotations.Where;
-import org.jugenfeier.contacts.model.base.SoftDeletedModelBase;
+import org.jugenfeier.contacts.model.base.BusinessModelBase;
 
 @Entity
 @Table(name = "phone_number")
@@ -14,7 +15,7 @@ import org.jugenfeier.contacts.model.base.SoftDeletedModelBase;
 @Builder
 @Getter @Setter
 @ToString
-public class PhoneNumber extends SoftDeletedModelBase {
+public class PhoneNumber extends BusinessModelBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "phone_number_id_sequence_generator")
@@ -27,6 +28,15 @@ public class PhoneNumber extends SoftDeletedModelBase {
     @Column(name = "call_number")
     private String callNumber;
 
+    @NotBlank(message = "Call number is required")
     @Column(name = "telephone_number")
     private String telephoneNumber;
+
+    @Column(name = "contact_id", nullable = false, insertable = false, updatable = false)
+    private Integer contactId;
+
+    @ManyToOne
+    @JoinColumn(name="contact_id", nullable = false)
+    @JsonBackReference
+    private Contact contact;
 }
