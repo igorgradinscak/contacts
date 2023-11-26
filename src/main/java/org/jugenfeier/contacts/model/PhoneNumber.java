@@ -28,6 +28,7 @@ public class PhoneNumber extends SoftDeletedModelBase {
     @Column(name = "call_number")
     private String callNumber;
 
+    @NotBlank(message = "Call number is required")
     @Column(name = "telephone_number")
     private String telephoneNumber;
 
