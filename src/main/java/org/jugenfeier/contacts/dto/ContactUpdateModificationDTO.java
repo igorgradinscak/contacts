@@ -7,7 +7,7 @@ import lombok.NonNull;
 import java.util.List;
 
 @Data
-public class ContactModificationDTO {
+public class ContactUpdateModificationDTO {
 
     @Schema(description = "Contact username", example = "Username")
     private String username;
@@ -22,14 +22,14 @@ public class ContactModificationDTO {
     private String email;
 
     @Schema(description = "Contact phone number")
-    private List<PhoneNumberModificationDTO> phoneNumberList;
+    private List<PhoneNumberUpdateModificationDTO> phoneNumberList;
 
-    public ContactModificationDTO(
+    public ContactUpdateModificationDTO(
             @NonNull final String username,
             @NonNull final String firstName,
             @NonNull final String lastName,
             @NonNull final String email,
-            @NonNull final List<PhoneNumberModificationDTO> phoneNumberList
+            @NonNull final List<PhoneNumberUpdateModificationDTO> phoneNumberList
             ) {
         this.username = username;
         this.firstName = firstName;
@@ -52,6 +52,6 @@ public class ContactModificationDTO {
     public boolean isRequestValid(){
         // Use Stream API to check if all phone numbers are valid
         return phoneNumberList.stream()
-                .allMatch(PhoneNumberModificationDTO::isPhoneNumberValid);
+                .allMatch(PhoneNumberUpdateModificationDTO::isPhoneNumberValid);
     }
 }
