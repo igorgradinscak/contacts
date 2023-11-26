@@ -16,6 +16,8 @@ create table public.phone_number
     call_number         varchar(64)                 not null,
     telephone_number    varchar(256)                not null,
     contact_id          int                         not null,
+    created             timestamp with time zone    not null,
+    updated             timestamp with time zone    not null,
     deleted             timestamp with time zone
 );
 

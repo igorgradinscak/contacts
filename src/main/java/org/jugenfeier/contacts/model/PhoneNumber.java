@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.annotations.Where;
-import org.jugenfeier.contacts.model.base.SoftDeletedModelBase;
+import org.jugenfeier.contacts.model.base.BusinessModelBase;
 
 @Entity
 @Table(name = "phone_number")
@@ -15,7 +15,7 @@ import org.jugenfeier.contacts.model.base.SoftDeletedModelBase;
 @Builder
 @Getter @Setter
 @ToString
-public class PhoneNumber extends SoftDeletedModelBase {
+public class PhoneNumber extends BusinessModelBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "phone_number_id_sequence_generator")
