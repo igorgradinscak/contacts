@@ -7,6 +7,7 @@ import org.hibernate.annotations.Where;
 import org.jugenfeier.contacts.model.base.BusinessModelBase;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name="contact")
@@ -43,4 +44,18 @@ public class Contact extends BusinessModelBase {
     @OneToMany (mappedBy = "contact", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<PhoneNumber> phoneNumberList;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Contact contact = (Contact) o;
+        return Objects.equals(id, contact.id) &&
+                Objects.equals(username, contact.username) &&
+                Objects.equals(firstName, contact.firstName) &&
+                Objects.equals(lastName, contact.lastName) &&
+                Objects.equals(email, contact.email) &&
+                Objects.equals(phoneNumberList, contact.phoneNumberList);
+    }
 }
